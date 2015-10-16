@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
     double spacing,rmin,rmax,maxRelError,kmin,kmax;
     double bias,biasbeta,biasGamma,biasSourceAbsorber,biasAbsorberResponse,meanFreePath,
         snlPar,snlPerp,kc,kcAlt,pc,sigma8,qnl,kv,av,bv,kp,knl,pnl,kpp,pp,kv0,pv,kvi,pvi;
+    bool imagpart;
     cli.add_options()
         ("help,h", "prints this info and exits.")
         ("verbose", "prints additional information.")
@@ -186,6 +187,7 @@ int main(int argc, char **argv) {
             "number of points spanning [rmin,rmax] to use")
         ("nmu", po::value<int>(&nmu)->default_value(11),
             "number of equally spaced mu_k and mu_r values for saving results")
+        ("imagpart", po::value<bool>(&imagpart)->default_value(false), "specify whether or not the Power Spectrum has imaginary part")
         ;
     // Do the command line parsing now
     po::variables_map vm;
@@ -231,7 +233,7 @@ int main(int argc, char **argv) {
         cosmo::KMuPkFunctionCPtr imdistPtr(new cosmo::KMuPkFunction(boost::bind(
             &LyaDistortion::operator(),rsd,_1,_2,_3)));
 
-    	cosmo::DistortedPowerCorrelationFft dpc(PkPtr,distPtr,imdistPtr,spacing,nx,ny,nz);
+    	cosmo::DistortedPowerCorrelationFft dpc(PkPtr,distPtr,imdistPtr,imagpart,spacing,nx,ny,nz);
     	if(verbose) {
         	std::cout << "Memory size = "
             	<< boost::format("%.1f Mb") % (dpc.getMemorySize()/1048576.) << std::endl;
