@@ -228,8 +228,10 @@ int main(int argc, char **argv) {
             snlPar,snlPerp,kc,kcAlt,pc,sigma8,qnl,kv,av,bv,kp,knl,pnl,kpp,pp,kv0,pv,kvi,pvi));
         cosmo::KMuPkFunctionCPtr distPtr(new cosmo::KMuPkFunction(boost::bind(
             &LyaDistortion::operator(),rsd,_1,_2,_3)));
+        cosmo::KMuPkFunctionCPtr imdistPtr(new cosmo::KMuPkFunction(boost::bind(
+            &LyaDistortion::operator(),rsd,_1,_2,_3)));
 
-    	cosmo::DistortedPowerCorrelationFft dpc(PkPtr,distPtr,spacing,nx,ny,nz);
+    	cosmo::DistortedPowerCorrelationFft dpc(PkPtr,distPtr,imdistPtr,spacing,nx,ny,nz);
     	if(verbose) {
         	std::cout << "Memory size = "
             	<< boost::format("%.1f Mb") % (dpc.getMemorySize()/1048576.) << std::endl;

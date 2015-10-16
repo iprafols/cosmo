@@ -27,8 +27,8 @@ namespace cosmo {
 }
 
 local::DistortedPowerCorrelationFft::DistortedPowerCorrelationFft(likely::GenericFunctionPtr power,
-KMuPkFunctionCPtr distortion, double spacing, int nx, int ny, int nz)
-: _power(power), _distortion(distortion), _spacing(spacing), _nx(nx), _ny(ny), _nz(nz), _pimpl(new Implementation())
+KMuPkFunctionCPtr distortion, KMuPkFunctionCPtr imdistortion, double spacing, int nx, int ny, int nz)
+: _power(power), _distortion(distortion), _imdistortion(imdistortion), _spacing(spacing), _nx(nx), _ny(ny), _nz(nz), _pimpl(new Implementation())
 {	
 	// Input parameter validation.
 	if(spacing <= 0 ) {
@@ -77,6 +77,16 @@ local::DistortedPowerCorrelationFft::~DistortedPowerCorrelationFft() {
 #endif
 }
 
+double local::DistortedPowerCorrelationFft::getImPower(double k, double mu) const {
+    if(mu < -1 || mu > 1) {
+        throw RuntimeError("DistortedPowerCorrelationFft::getPower: expected -1 <= mu <= 1.");
+    }
+    if(k < 0 ) {
+        throw RuntimeError("DistortedPowerCorrelationFft::getPower: expected k >= 0.");
+    }
+    return (*_power)(k)*(*_imdistortion)(k,mu,(*_power)(k));
+}
+
 double local::DistortedPowerCorrelationFft::getPower(double k, double mu) const {
 	if(mu < -1 || mu > 1) {
 		throw RuntimeError("DistortedPowerCorrelationFft::getPower: expected -1 <= mu <= 1.");
@@ -119,7 +129,7 @@ void local::DistortedPowerCorrelationFft::transform() {
             	if(k>0) {
             		double mu = _kygrid[iy]/k;
             		_pimpl->data[index][0] = getPower(k,mu);
-            		_pimpl->data[index][1] = 0;
+            		_pimpl->data[index][1] = getImPower(k,mu);
             	}
             }
         }

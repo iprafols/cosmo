@@ -28,11 +28,12 @@ namespace cosmo {
 	public:
 		// Creates a new distorted power correlation function using the specified
 		// isotropic power P(k) and distortion function D(k,mu).
-		DistortedPowerCorrelationFft(likely::GenericFunctionPtr power, KMuPkFunctionCPtr distortion,
+		DistortedPowerCorrelationFft(likely::GenericFunctionPtr power, KMuPkFunctionCPtr distortion, KMuPkFunctionCPtr imdistortion,
 			double spacing, int nx, int ny, int nz);
 		virtual ~DistortedPowerCorrelationFft();
 		// Returns the value of P(k,mu) = P(k)*D(k,mu).
 		double getPower(double k, double mu) const;
+        double getImPower(double k, double mu) const;
 		// Returns the correlation function xi(r,mu).
 		double getCorrelation(double r, double mu) const;
 		// Transforms the k-space power spectrum to r space.
@@ -44,7 +45,7 @@ namespace cosmo {
 		class Implementation;
 		boost::scoped_ptr<Implementation> _pimpl;
 		likely::GenericFunctionPtr _power;
-		KMuPkFunctionCPtr _distortion;
+		KMuPkFunctionCPtr _distortion, _imdistortion;
 		std::vector<double> _kxgrid, _kygrid, _kzgrid;
 		boost::shared_array<double> _xi;
 		double _spacing, _norm;
